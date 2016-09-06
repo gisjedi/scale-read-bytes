@@ -4,11 +4,8 @@ import sys
 import json
 import os
 
-log = logging.getLogger()
-consoleFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-consoleHandler = logging.StreamHandler(sys.stdout)
-consoleHandler.setFormatter(consoleFormatter)
-log.addHandler(consoleHandler)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
+                    level=logging.DEBUG, stream=sys.stdout)
 
 
 def run_algorithm(bytes_total, input_file, out_dir):
@@ -23,10 +20,10 @@ def run_algorithm(bytes_total, input_file, out_dir):
     bytes_read = 0
     chunk_size = 512
 
-    log.info('Reading %s bytes from %s and storing at %s.' % (bytes_total, input_file, out_dir))
+    logging.info('Reading %s bytes from %s and storing at %s.' % (bytes_total, input_file, out_dir))
 
     output_file = os.path.join(out_dir, os.path.basename(input_file))
-    log.info('Data being stored in %s' % output_file)
+    logging.info('Data being stored in %s' % output_file)
     with open(input_file, 'rb') as infile:
         with open(output_file, 'wb') as outfile:
             while bytes_read <= bytes_total:
@@ -40,7 +37,7 @@ def run_algorithm(bytes_total, input_file, out_dir):
                 outfile.write(chunk)
                 bytes_read += chunk_size
 
-    log.info('Copy complete')
+    logging.info('Copy complete')
 
     return output_file
 
@@ -58,7 +55,7 @@ def generate_results_manifest(output_dir, output_file):
     with open(os.path.join(output_dir, 'results_manifest.json'), 'w') as outfile:
         json.dump(json_dict, outfile)
 
-    log.info('Completed manifest creation')
+    logging.info('Completed manifest creation')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Copy x number of bytes from input file to output file.')
@@ -67,9 +64,9 @@ if __name__ == '__main__':
     parser.add_argument('output_dir', help='absolute output directory path')
     args = parser.parse_args()
 
-    log.debug('Bytes to copy: {}'.format(args.bytes_total))
-    log.debug('Input file: {}'.format(args.input_file))
-    log.debug('Output directory: {}'.format(args.output_dir))
+    logging.debug('Bytes to copy: {}'.format(args.bytes_total))
+    logging.debug('Input file: {}'.format(args.input_file))
+    logging.debug('Output directory: {}'.format(args.output_dir))
 
     output_file = run_algorithm(args.bytes_total, args.input_file, args.output_dir)
     generate_results_manifest(args.output_dir, output_file)
